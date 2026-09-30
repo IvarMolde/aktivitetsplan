@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Øvingsplan – øv på aktivitetsplanen</title>
+<style>
+:root{
+  --blue:#0067c5; --blue-dark:#00459a; --band:#cddce8; --band-line:#8fb0cc;
+  --green:#cfe3d9; --gray:#e9e7e7; --col:#c9c2c2; --text:#262626; --muted:#5f5f5f;
+  --err:#ba3a26; --yellow:#ffc166; --line:#b0b0b0; --white:#fff; --ok:#2c6b2f;
+}
+*{box-sizing:border-box}
+html{font-size:16px}
+body{margin:0;font-family:"Source Sans Pro","Segoe UI",Helvetica,Arial,sans-serif;color:var(--text);background:#fff;line-height:1.45}
+button{font:inherit;cursor:pointer}
+a{color:var(--blue)}
+.sr{position:absolute;left:-9999px}
+
+/* Øvingsbanner */
+#banner{background:#fff3cd;border-bottom:2px solid #e0b64d;padding:.45rem 1rem;text-align:center;font-size:.92rem;font-weight:600;color:#5a4500}
+#banner b{background:#5a4500;color:#fff;border-radius:3px;padding:0 .4rem;margin-right:.4rem}
+
+/* Topp */
+.top{background:#fff;border-bottom:1px solid #d6d6d6}
+.top-in{max-width:1100px;margin:0 auto;padding:.6rem 1rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:.6rem;font-weight:800;font-size:1.25rem;color:#1b3f63;text-decoration:none}
+.logo i{width:2.1rem;height:2.1rem;border-radius:50%;background:var(--blue);display:grid;place-items:center;color:#fff;font-style:normal;font-size:1rem}
+.nav{display:flex;gap:1.2rem;margin-left:auto;align-items:center;flex-wrap:wrap}
+.nav button{background:none;border:0;font-weight:700;font-size:.95rem;letter-spacing:.02em;text-transform:uppercase;color:var(--text);padding:.3rem 0}
+.nav button.act{color:var(--blue)}
+.nav .user{font-size:.9rem;color:var(--muted);text-transform:none;font-weight:400}
+
+/* Bånd */
+.band{background:var(--band);border-bottom:3px solid var(--band-line);padding:1rem 1rem 1.6rem}
+.band-in{max-width:1100px;margin:0 auto}
+.crumbs{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;font-size:1rem}
+.crumbs button{background:none;border:0;color:#1b5a8a;text-decoration:underline;padding:0}
+.crumbs span.sep{color:#555}
+.crumbs svg{width:1.7rem;height:1.7rem;margin-right:.3rem}
+.band h1{margin:.6rem 0 0;text-align:center;font-size:2.4rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:.7rem}
+.band h1 svg{width:2.4rem;height:2.4rem}
+
+.wrap{max-width:1100px;margin:0 auto;padding:1.5rem 1rem 6rem}
+.narrow{max-width:760px}
+
+/* Login */
+.login{max-width:440px;margin:2rem auto;padding:0 1rem}
+.login .box{border:1px solid #c6c6c6;border-radius:6px;padding:1.6rem;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.login h1{margin:.2rem 0 .3rem;font-size:1.6rem;color:#1b3f63}
+.steps{display:flex;gap:.5rem;margin:1rem 0}
+.steps span{flex:1;height:.4rem;border-radius:3px;background:#d4d4d4}
+.steps span.on{background:var(--blue)}
+.hint{background:#eaf4ea;border:1px solid #9cc79c;border-radius:4px;padding:.55rem .75rem;margin:.6rem 0;font-size:.95rem}
+.hint code{font-weight:700;background:#fff;padding:0 .3rem;border-radius:3px}
+.warn{background:#fff3cd;border:1px solid #e0b64d;border-radius:4px;padding:.55rem .75rem;font-size:.92rem;margin-top:1rem}
+
+/* Skjema */
+label.lbl,.lbl{display:block;font-weight:600;margin:1rem 0 .3rem}
+.lbl small{font-weight:400;color:var(--muted)}
+input[type=text],input[type=date],input[type=password],textarea,select{width:100%;font:inherit;padding:.6rem .7rem;border:1px solid #7a7a7a;border-radius:4px;background:#fff;color:var(--text)}
+textarea{min-height:5.5rem;resize:vertical}
+input:focus,textarea:focus,select:focus,button:focus-visible{outline:3px solid #ffb400;outline-offset:1px}
+input[aria-invalid=true],textarea[aria-invalid=true]{border:2px solid var(--err)}
+.err{color:var(--err);font-weight:600;font-size:.92rem;margin-top:.25rem}
+.errsum{border:2px solid var(--err);background:#fdf0ed;border-radius:4px;padding:.6rem .8rem;margin:1rem 0;font-weight:600;color:var(--err)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.radio{display:flex;align-items:center;gap:.6rem;padding:.3rem 0}
+.radio input{width:1.3rem;height:1.3rem;accent-color:var(--blue)}
+.count{font-style:italic;color:var(--muted);font-size:.9rem;margin-top:.2rem}
+.req-note{text-align:right;color:var(--muted);font-size:.9rem;margin-bottom:-.6rem}
+
+/* Knapper */
+.btn{background:var(--blue);color:#fff;border:2px solid var(--blue);border-radius:4px;padding:.6rem 1.3rem;font-weight:700;letter-spacing:.03em}
+.btn:hover{background:var(--blue-dark);border-color:var(--blue-dark)}
+.btn.up{text-transform:uppercase}
+.btn.sec{background:#fff;color:var(--blue)}
+.btn.sec:hover{background:#e6f0fa}
+.btn.dlg{background:var(--yellow);border-color:var(--yellow);color:#1b1b1b}
+.linkbtn{background:none;border:0;color:var(--blue);text-decoration:underline;padding:0}
+
+/* Kort */
+.cards{display:grid;gap:1rem;grid-template-columns:repeat(3,1fr);margin-top:1rem}
+.tile{background:#fff;border:1px solid #bdbdbd;border-radius:4px;padding:1.4rem 1rem;text-align:center;font-weight:700;font-size:1.15rem;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tile:hover{border-color:var(--blue);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.tile svg{width:3.6rem;height:3.6rem;color:#7d7d7d;display:block;margin:0 auto .6rem}
+.tile.dis{cursor:default;color:#555}
+.row-card{display:flex;align-items:center;gap:1rem;background:#fff;border:1px solid #bdbdbd;border-radius:4px;padding:1rem 1.2rem;text-align:left;width:100%;margin-bottom:1rem}
+.row-card:hover{border-color:var(--blue);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.row-card .ic{width:2.2rem;height:2.2rem;flex:none;color:#333;display:block}.row-card .ic svg{width:100%;height:100%}
+.row-card b{display:block;font-size:1.2rem}
+.row-card span{color:#3f3f3f}
+.row-card .chev{margin-left:auto;width:1.2rem;height:1.2rem;flex:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.two .row-card{margin-bottom:0}
+.notice{display:flex;align-items:center;gap:.8rem;background:#fff;border:1px solid #ddd;padding:.7rem 1rem;margin:1.2rem 0}
+.notice i{width:2.6rem;height:2.6rem;background:#fde3c7;display:grid;place-items:center;border-radius:3px;font-style:normal}
+
+/* Mål */
+.goal{display:flex;gap:1.4rem;align-items:flex-start;background:var(--green);border-radius:4px;padding:1.3rem 1.5rem}
+.goal .pic{width:5.2rem;height:5.2rem;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none}
+.goal .pic svg{width:3rem;height:3rem}
+.goal h2{margin:0 0 .3rem;font-size:1.05rem}
+.goal p{margin:0 0 .8rem;font-style:italic;font-size:1.05rem}
+.toolbar{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;margin:1.3rem 0}
+.toolbar .sp{margin-left:auto;display:flex;gap:.9rem;align-items:center;flex-wrap:wrap;position:relative}
+.toolbar .ico{background:none;border:0;padding:.2rem;color:#444}
+.toolbar .ico svg{width:1.6rem;height:1.6rem}
+.dd{border:1px solid var(--line);background:#fff;border-radius:3px;padding:.55rem .9rem;display:flex;gap:.5rem;align-items:center}
+.filter-panel{position:absolute;right:0;top:calc(100% + .4rem);z-index:20;background:#fff;border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.2);padding:1rem 1.3rem;display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;min-width:min(520px,92vw)}
+.filter-panel h3{margin:0 0 .5rem;font-size:1.1rem}
+.filter-panel label{display:flex;gap:.5rem;align-items:center;padding:.2rem 0}
+.filter-panel input{width:1.15rem;height:1.15rem;accent-color:var(--blue)}
+
+/* Brett */
+.board{display:flex;gap:1rem;overflow-x:auto;padding-bottom:1rem}
+.col{flex:0 0 270px;background:var(--col);border-radius:4px 4px 0 0;min-height:14rem;position:relative}
+.col-h{display:flex;align-items:center;justify-content:space-between;padding:.8rem .8rem;font-size:1.15rem;font-weight:700;background:#c2bbbb}
+.col-h button{background:none;border:0;color:var(--blue);padding:0;display:grid}
+.col-h button svg{width:1.6rem;height:1.6rem}
+.pop{position:absolute;top:2.9rem;left:.6rem;right:.6rem;background:#fff;border:1px solid var(--line);box-shadow:0 4px 12px rgba(0,0,0,.25);padding:.7rem;z-index:5;font-size:.95rem}
+.acts{padding:.6rem}
+.acard{display:block;width:100%;text-align:left;background:#fff;border:1px solid #d0d0d0;border-radius:3px;padding:.7rem .8rem;margin-bottom:.6rem;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.acard:hover{box-shadow:0 2px 8px rgba(0,0,0,.3);border-color:var(--blue)}
+.acard .t{font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:#444}
+.acard .n{font-weight:700;font-size:1.05rem;margin:.1rem 0}
+.acard .s{color:#444;font-size:.95rem}
+.tag{display:inline-block;margin-top:.4rem;font-size:.85rem;padding:.05rem .5rem;border-radius:3px;border:1px solid #89c4dc;background:#d9f0f8}
+.tag.ok{background:#cdeccf;border-color:#7cc27f}
+.tag.no{background:#f7d7d1;border-color:#d99b90}
+.empty{color:#5a5a5a;font-size:.92rem;padding:.4rem .4rem}
+
+/* Modal */
+#modal-root .bd{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;justify-content:center;align-items:flex-start;overflow-y:auto;padding:2rem 1rem}
+.modal{background:#eae8e8;width:100%;max-width:640px;border-radius:4px;box-shadow:0 8px 30px rgba(0,0,0,.4);position:relative}
+.m-top{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.3rem;border-bottom:1px solid #c7c2c2;min-height:3.4rem}
+.m-top .x{background:none;border:2px solid #555;width:2.3rem;height:2.3rem;font-size:1.4rem;line-height:1;color:#444;display:grid;place-items:center;padding:0}
+.m-body{padding:1.2rem 1.6rem 1.8rem}
+.m-body h2{font-size:2.1rem;margin:.2rem 0 .6rem;font-weight:600}
+.m-body input[type=text],.m-body input[type=date],.m-body textarea{background:#fff}
+.opt{display:flex;align-items:center;justify-content:space-between;width:100%;background:#fff;border:1px solid #bdbdbd;border-radius:3px;padding:1rem 1.1rem;margin-bottom:.9rem;font-weight:700;font-size:1.05rem;text-align:left}
+.opt:hover{border-color:var(--blue);color:var(--blue);text-decoration:underline}
+.add-pic{display:grid;place-items:center;margin:.3rem 0 .4rem}
+.add-pic i{width:7rem;height:7rem;border-radius:50%;background:#bdd5d9;display:grid;place-items:center}
+.add-pic svg{width:4.2rem;height:4.2rem;color:#3a3a3a}
+.dl dt{font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:#555;margin-top:1.1rem}
+.dl dd{margin:.1rem 0 0}
+.acc{border:1px solid #9bb;background:#fff;border-radius:3px;margin-top:1rem}
+.acc-h{width:100%;display:flex;gap:.8rem;align-items:center;background:#e1ecf7;border:0;padding:.8rem 1rem;text-align:left;font-weight:700;color:#0b4f8a}
+.acc-b{padding:.8rem 1rem 1rem}
+.hist{font-size:.92rem;color:#444;margin:.5rem 0 0;padding-left:1.1rem}
+.saved{color:var(--ok);font-weight:700;margin-left:.8rem}
+
+/* Drawer */
+#mbtn{position:fixed;right:1rem;bottom:1rem;z-index:60;background:#1b3f63;color:#fff;border:0;border-radius:2rem;padding:.75rem 1.2rem;font-weight:700;box-shadow:0 3px 12px rgba(0,0,0,.4)}
+#drawer{position:fixed;right:0;top:0;bottom:0;width:min(400px,100%);background:#fff;z-index:90;box-shadow:-4px 0 20px rgba(0,0,0,.3);overflow-y:auto;padding:1.2rem 1.3rem;transform:translateX(102%);transition:transform .25s}
+#drawer.open{transform:none}
+#drawer h2{margin:0 0 .3rem;font-size:1.4rem;color:#1b3f63}
+.m-list{list-style:none;margin:1rem 0;padding:0}
+.m-list li{display:flex;gap:.7rem;padding:.65rem .5rem;border-bottom:1px solid #e3e3e3}
+.m-list .ck{flex:none;width:1.6rem;height:1.6rem;border-radius:50%;border:2px solid #9aa;display:grid;place-items:center;font-size:.9rem;color:#fff}
+.m-list li.done .ck{background:var(--ok);border-color:var(--ok)}
+.m-list li.done b{color:var(--ok)}
+.m-list small{display:block;color:#555}
+.bar{height:.7rem;background:#e0e6ec;border-radius:1rem;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);transition:width .3s}
+.win{background:#eaf4ea;border:2px solid var(--ok);border-radius:6px;padding:.8rem 1rem;margin:1rem 0;font-weight:700}
+.foot{max-width:1100px;margin:0 auto;padding:0 1rem 5rem;color:var(--muted);font-size:.9rem}
+
+@media (max-width:760px){
+  .cards,.two,.row2{grid-template-columns:1fr}
+  .band h1{font-size:1.8rem}
+  .goal{flex-direction:column}
+  .filter-panel{grid-template-columns:1fr}
+  .toolbar .sp{margin-left:0}
+}
+@media print{
+  #banner,.top,#mbtn,#drawer,.toolbar,.crumbs,#modal-root,.foot{display:none!important}
+  .band{background:none;border:0}
+  .board{flex-wrap:wrap;overflow:visible}
+  .col{flex:0 0 46%;break-inside:avoid}
+  .goal{border:1px solid #999}
+  body::before{content:"ØVINGSUTSKRIFT – ikke en ekte aktivitetsplan";display:block;font-weight:700;padding:.4rem 0}
+}
+</style>
+</head>
+<body>
+<div id="banner" role="note"><b>ØVING</b> Dette er en øvingsside for språkopplæring. Den er ikke NAV og ikke BankID. Ingen data sendes noe sted. Skriv aldri inn ditt eget fødselsnummer.</div>
+<div id="app"></div>
+<div id="modal-root"></div>
+<button id="mbtn" type="button" data-action="missions">Øvingsoppdrag <span id="mcount"></span></button>
+<aside id="drawer" aria-label="Øvingsoppdrag"></aside>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- Hjelpefunksjoner ---------- */
+var $ = function(s, r){ return (r||document).querySelector(s); };
+var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); };
+var KEY = 'ovingsplan_v1';
+var DEFAULT_GOAL = 'En fast jobb innenfor det området jeg har kompetanse og interesse.';
+
+var COLS = [
+  {k:'forslag', n:'Forslag', help:'Forslag: en idé til en aktivitet. Du har ikke bestemt deg ennå.'},
+  {k:'planlegger', n:'Planlegger', help:'Planlegger: du skal gjøre aktiviteten senere.'},
+  {k:'gjennomforer', n:'Gjennomfører', help:'Gjennomfører: du gjør aktiviteten nå.'},
+  {k:'fullfort', n:'Fullført', help:'Fullført: du er ferdig med aktiviteten.'},
+  {k:'avbrutt', n:'Avbrutt', help:'Avbrutt: du stoppet aktiviteten.'}
+];
+var TYPES = {
+  sok:  {n:'En jobb jeg vil søke på', lbl:'Stilling'},
+  egen: {n:'Jobbrettet egenaktivitet', lbl:'Jobbrettet egenaktivitet'},
+  jobb: {n:'Jobb jeg har nå', lbl:'Jobb jeg har nå'}
+};
+var SOKNAD = [
+  {k:'ikke', n:'Ikke startet'},
+  {k:'sendt', n:'Sendt søknad'},
+  {k:'intervju', n:'Skal på intervju'},
+  {k:'fikk', n:'Fikk jobben'},
+  {k:'avslag', n:'Fikk ikke jobben'}
+];
+var MISSIONS = [
+  {k:'login', t:'Logg inn', h:'Bruk øvingsinnloggingen. Hintene står på skjermen.'},
+  {k:'plan', t:'Finn «Aktivitetsplanen din»', h:'Min side → Veien til arbeid → Aktivitetsplanen din.'},
+  {k:'goal', t:'Skriv et nytt mål og lagre', h:'Klikk «Rediger». Skriv for eksempel: «Jeg vil jobbe som renholder.»'},
+  {k:'jobb', t:'Legg til «Jobb jeg har nå»', h:'Legg til aktivitet → Jobb jeg har nå. Fyll ut feltene med stjerne (*).'},
+  {k:'egen', t:'Legg til en «Jobbrettet egenaktivitet»', h:'For eksempel: «Sjekke Arbeidsplassen hver dag».'},
+  {k:'sok', t:'Legg til «En jobb jeg vil søke på»', h:'Fyll ut stillingstittel og dato. Klikk «Lagre».'},
+  {k:'sendt', t:'Sett søknadsstatus til «Sendt søknad»', h:'Åpne jobbsøknaden. Velg «Hvor langt har du kommet i søknadsprosessen?»'},
+  {k:'gjen', t:'Sett aktivitetsstatus til «Gjennomfører»', h:'Åpne en aktivitet. Velg «Hva er status på aktiviteten?» og klikk «Lagre».'},
+  {k:'filter', t:'Bruk «Filtrer»', h:'Klikk «Filtrer» og velg en aktivitetstype eller status.'},
+  {k:'print', t:'Prøv «Skriv ut»', h:'Klikk på printer-symbolet.'}
+];
+
+/* ---------- Tilstand ---------- */
+var memory = null;
+function blank(){ return {view:'login', step:0, loggedIn:false, goal:DEFAULT_GOAL, oldGoals:[], acts:[], done:{}, filter:{types:[], statuses:[]}}; }
+var S = blank();
+function load(){
+  try{ var r = localStorage.getItem(KEY); if(r){ var o = JSON.parse(r); S = Object.assign(blank(), o); S.view = S.loggedIn ? (S.view==='login'?'minside':S.view) : 'login'; S.step = 0; return; } }catch(e){}
+  if(memory){ S = memory; }
+}
+function save(){
+  memory = S;
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
+}
+var ui = {filterOpen:false, help:null, drawer:false, error:'', hintOpen:true};
+function mark(k){ if(!S.done[k]){ S.done[k] = true; save(); updateMissions(); } }
+
+/* ---------- SVG-ikoner ---------- */
+var IC = {
+  user:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="16" cy="16" r="14.5"/><circle cx="16" cy="12.5" r="4.6"/><path d="M7 25c1.8-4.3 5-6.2 9-6.2s7.2 1.9 9 6.2"/></svg>',
+  cup:'<svg viewBox="0 0 40 40"><path d="M9 16h16l-2 18H11z" fill="#3d6d86"/><path d="M13 16 12 4M17 16l1-13M21 16l4-11" stroke="#b5874b" stroke-width="2.2" stroke-linecap="round"/><path d="M15 16l-1-9" stroke="#6aa2b8" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  kbd:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="8" width="36" height="18" rx="2"/><path d="M9 13h3M15 13h3M21 13h3M27 13h3M33 13h3M9 18h3M15 18h3M21 18h3M27 18h3M33 18h3M13 22h18"/><path d="M34 44V32c0-2 3-2 3 0v5l5 2v5" stroke-linejoin="round"/></svg>',
+  desk:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><circle cx="24" cy="9" r="4"/><path d="M20 16h8l3 9h9v18M11 43V28h8M14 28V16M11 34h14M20 25h11"/></svg>',
+  sign:'<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4v40M6 12h16l4 4-4 4H6zM22 24h16v8H22l-4-4z"/><circle cx="36" cy="10" r="3"/><path d="M36 14v14"/></svg>',
+  chat:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16v11H11l-5 4v-4H4z"/><path d="M22 12h6v11h-2v3l-4-3h-6v-3"/></svg>',
+  mail:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 10h20v16H6z"/><path d="M9 10V5h14v5M11 14h10M11 18h10M11 22h6"/></svg>',
+  print:'<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12V5h14v7M9 23H4V12h24v11h-5"/><rect x="9" y="19" width="14" height="8"/></svg>',
+  chev:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 2l6 6-6 6"/></svg>',
+  down:'<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 5l6 6 6-6"/></svg>',
+  q:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2"><circle cx="14" cy="14" r="12"/><path d="M10.5 11a3.5 3.5 0 1 1 5 3.2c-1.2.7-1.5 1.3-1.5 2.6"/><circle cx="14" cy="20.5" r=".9" fill="currentColor"/></svg>',
+  ok:'<svg viewBox="0 0 64 64" fill="none" stroke="#7d7d7d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 34l-6-10c-1-2 2-4 4-2l5 6V12c0-3 4-3 4 0v12c0-3 4-3 4 0v3c0-3 4-3 4 0v3c0-2 4-2 4 1v10c0 6-4 10-10 10h-3c-4 0-6-2-8-6z"/><path d="M10 14l-3-3M13 9l-1-4M6 20H2" stroke="#e0a43c"/></svg>',
+  mon:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.6"><rect x="8" y="6" width="48" height="34" rx="2" fill="#fff"/><path d="M16 14h4M24 14h22M16 21h4M24 21h22M16 28h4M24 28h22M26 40v8M38 40v8M20 50h24"/></svg>'
+};
+
+/* ---------- Visninger ---------- */
+function topbar(){
+  return '<header class="top"><div class="top-in">'
+    + '<a class="logo" href="#" data-action="nav" data-to="minside"><i>Ø</i>Øvingsplan</a>'
+    + '<nav class="nav" aria-label="Hovedmeny">'
+    + '<button type="button" class="'+(S.view==='minside'?'act':'')+'" data-action="nav" data-to="minside">Min side</button>'
+    + '<button type="button" data-action="info" data-info="om">Om øvingssiden</button>'
+    + (S.loggedIn ? '<span class="user">Ola Nordmann (øving)</span><button type="button" data-action="logout">Logg ut</button>' : '')
+    + '</nav></div></header>';
+}
+function crumbs(list){
+  var h = '<div class="crumbs">'+IC.user;
+  list.forEach(function(c, i){
+    if(i) h += '<span class="sep">/</span>';
+    h += c.to ? '<button type="button" data-action="nav" data-to="'+c.to+'">'+esc(c.t)+'</button>' : '<span>'+esc(c.t)+'</span>';
+  });
+  return h + '</div>';
+}
+
+function vLogin(){
+  var st = S.step;
+  var h = '<div class="login"><div class="box">';
+  h += '<div class="logo" style="margin-bottom:.6rem"><i>Ø</i>Øvingsplan</div>';
+  h += '<h1>Øvingsinnlogging</h1>';
+  h += '<p style="margin:.2rem 0">Slik øver du på å logge inn. I virkeligheten bruker du BankID på nettsiden til NAV.</p>';
+  h += '<div class="steps" aria-hidden="true"><span class="on"></span><span class="'+(st>=1?'on':'')+'"></span><span class="'+(st>=2?'on':'')+'"></span></div>';
+  h += '<p class="sr" aria-live="polite">Steg '+(st+1)+' av 3</p>';
+  h += '<form data-form="login" novalidate>';
+  if(st===0){
+    h += '<label class="lbl" for="l-id">Steg 1 av 3: Fødselsnummer (11 siffer)</label>';
+    h += '<input id="l-id" type="text" inputmode="numeric" autocomplete="off" maxlength="11"'+(ui.error?' aria-invalid="true" aria-describedby="l-err"':'')+'>';
+    h += '<div class="hint">Skriv øvingsnummeret: <code>12345678901</code></div>';
+  } else if(st===1){
+    h += '<label class="lbl" for="l-code">Steg 2 av 3: Engangskode</label>';
+    h += '<input id="l-code" type="text" inputmode="numeric" autocomplete="off" maxlength="6"'+(ui.error?' aria-invalid="true" aria-describedby="l-err"':'')+'>';
+    h += '<div class="hint">I virkeligheten får du en kode i appen eller på en kodebrikke.<br>Skriv øvingskoden: <code>123456</code></div>';
+  } else {
+    h += '<label class="lbl" for="l-pw">Steg 3 av 3: Personlig passord</label>';
+    h += '<input id="l-pw" type="password" autocomplete="off"'+(ui.error?' aria-invalid="true" aria-describedby="l-err"':'')+'>';
+    h += '<div class="hint">Skriv øvingspassordet: <code>ovingpass</code></div>';
+  }
+  if(ui.error) h += '<div class="err" id="l-err" role="alert">'+esc(ui.error)+'</div>';
+  h += '<div style="display:flex;gap:.8rem;margin-top:1.2rem">';
+  if(st>0) h += '<button type="button" class="btn sec" data-action="login-back">Tilbake</button>';
+  h += '<button class="btn" type="submit">'+(st<2?'Neste':'Logg inn')+'</button></div>';
+  h += '</form>';
+  h += '<div class="warn"><b>Ikke skriv inn ditt eget fødselsnummer eller passord her.</b> Denne siden er bare en øvelse, og den godtar bare øvingsverdiene.</div>';
+  h += '</div></div>';
+  return h;
+}
+
+function vMinside(){
+  return topbar()
+  + '<div class="band"><div class="band-in">'+crumbs([{t:'Min side'}])+'<h1>Min side</h1></div></div>'
+  + '<main class="wrap"><div style="text-align:center"><div style="width:4.5rem;margin:0 auto;color:#555">'+IC.user+'</div>'
+  + '<p style="font-weight:700;font-size:1.2rem;margin:.6rem 0 0">Ola Nordmann (øving)</p>'
+  + '<p style="font-weight:700;font-size:1.05rem;margin:.2rem 0">Du er registrert som arbeidssøker.</p></div>'
+  + '<div class="notice"><i>⏰</i><span>Neste meldekort kan sendes fra fredag. <small>(Eksempel – ikke ekte)</small></span></div>'
+  + '<div class="cards">'
+  + '<button type="button" class="tile dis" data-action="info" data-info="meldekort">'+IC.kbd+'Meldekort</button>'
+  + '<button type="button" class="tile dis" data-action="info" data-info="cv">'+IC.desk+'Registrer/oppdater CV og jobbprofil</button>'
+  + '<button type="button" class="tile" data-action="nav" data-to="veien">'+IC.sign+'Veien til arbeid</button>'
+  + '</div><p class="foot" style="padding:1.2rem 0 0">Tips: Klikk på «Veien til arbeid».</p></main>';
+}
+
+function vVeien(){
+  return topbar()
+  + '<div class="band"><div class="band-in">'+crumbs([{t:'Min side', to:'minside'},{t:'Veien til arbeid'}])+'<h1>Veien til arbeid</h1></div></div>'
+  + '<main class="wrap narrow">'
+  + '<button type="button" class="row-card" data-action="nav" data-to="plan"><span class="ic">'+IC.cup+'</span><span><b>Aktivitetsplanen din</b><span>Her holder du orden på aktiviteter du gjør i samarbeid med veileder.</span></span><span class="chev">'+IC.chev+'</span></button>'
+  + '<div class="two">'
+  + '<button type="button" class="row-card" data-action="info" data-info="dialog"><span class="ic">'+IC.chat+'</span><span><b>Dialog med veileder</b><span>Ingen uleste dialoger</span></span><span class="chev">'+IC.chev+'</span></button>'
+  + '<button type="button" class="row-card" data-action="info" data-info="meldekort"><span class="ic">'+IC.mail+'</span><span><b>Meldekort</b><span>Du må sende meldekort hver 14. dag.</span></span><span class="chev">'+IC.chev+'</span></button>'
+  + '</div></main>';
+}
+
+function fmt(d){
+  if(!d) return '';
+  var p = d.split('-'); if(p.length!==3) return d;
+  var m = ['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'][+p[1]-1];
+  return (+p[2])+'. '+m+' '+p[0];
+}
+function cardHtml(a){
+  var sec = '';
+  if(a.type==='sok'){ sec = esc(a.arbeidsgiver || ''); }
+  else if(a.type==='jobb'){ sec = esc(a.arbeidsgiver || '') + (a.fra ? '<br>Fra: '+fmt(a.fra) : ''); }
+  else { sec = fmt(a.fra) + (a.til ? ' – ' + fmt(a.til) : ''); }
+  var tag = '';
+  if(a.type==='sok' && a.soknad && a.soknad!=='ikke'){
+    var sn = SOKNAD.filter(function(x){return x.k===a.soknad;})[0];
+    tag = '<span class="tag '+(a.soknad==='sendt'||a.soknad==='fikk'?'ok':(a.soknad==='avslag'?'no':''))+'">'+esc(sn.n)+'</span>';
+  }
+  return '<button type="button" class="acard" data-action="open-act" data-id="'+a.id+'"><div class="t">'+esc(TYPES[a.type].lbl)+'</div><div class="n">'+esc(a.title)+'</div><div class="s">'+sec+'</div>'+tag+'</button>';
+}
+function visible(a){
+  var f = S.filter;
+  if(f.types.length && f.types.indexOf(a.type)<0) return false;
+  if(f.statuses.length && f.statuses.indexOf(a.status)<0) return false;
+  return true;
+}
+function vPlan(){
+  var h = topbar();
+  h += '<div class="band"><div class="band-in">'+crumbs([{t:'Min side', to:'minside'},{t:'Veien til arbeid', to:'veien'},{t:'Aktivitetsplan'}])
+     + '<h1><span style="width:2.4rem">'+IC.cup+'</span>Aktivitetsplan</h1></div></div>';
+  h += '<main class="wrap">';
+  h += '<section class="goal" aria-label="Mitt mål"><div class="pic">'+IC.ok+'</div><div><h2>Mitt mål</h2><p>«'+esc(S.goal)+'»</p><button type="button" class="btn up" data-action="edit-goal">Rediger</button></div></section>';
+  h += '<div class="toolbar">';
+  h += '<button type="button" class="btn dlg up" data-action="info" data-info="dialog">Dialog</button>';
+  h += '<button type="button" class="btn up" data-action="add">Legg til aktivitet</button>';
+  h += '<div class="sp"><button type="button" class="linkbtn" data-action="info" data-info="om">Om tjenesten</button>';
+  h += '<button type="button" class="ico" data-action="print" aria-label="Skriv ut">'+IC.print+'</button>';
+  h += '<button type="button" class="dd" data-action="filter" aria-expanded="'+ui.filterOpen+'">Filtrer '+IC.down+'</button>';
+  if(ui.filterOpen){
+    h += '<div class="filter-panel" role="group" aria-label="Filter"><div><h3>Aktivitetstype</h3>';
+    Object.keys(TYPES).forEach(function(k){
+      var name = k==='sok' ? 'Stilling jeg skal søke' : TYPES[k].n;
+      h += '<label><input type="checkbox" data-filter="types" value="'+k+'"'+(S.filter.types.indexOf(k)>=0?' checked':'')+'>'+esc(name)+'</label>';
+    });
+    h += '</div><div><h3>Status</h3>';
+    COLS.forEach(function(c){ h += '<label><input type="checkbox" data-filter="statuses" value="'+c.k+'"'+(S.filter.statuses.indexOf(c.k)>=0?' checked':'')+'>'+esc(c.n)+'</label>'; });
+    h += '</div></div>';
+  }
+  h += '</div></div>';
+  h += '<div class="board" role="list">';
+  COLS.forEach(function(c){
+    var items = S.acts.filter(function(a){ return a.status===c.k && visible(a); });
+    h += '<section class="col" role="listitem" aria-label="'+c.n+'"><div class="col-h"><span>'+c.n+'</span><button type="button" data-action="help" data-col="'+c.k+'" aria-label="Hjelp: '+c.n+'">'+IC.q+'</button></div>';
+    if(ui.help===c.k) h += '<div class="pop" role="status">'+esc(c.help)+'</div>';
+    h += '<div class="acts">';
+    h += items.length ? items.map(cardHtml).join('') : '<p class="empty">Ingen aktiviteter her.</p>';
+    h += '</div></section>';
+  });
+  h += '</div></main>';
+  h += '<div class="foot"><button type="button" class="linkbtn" data-action="reset">Nullstill alle øvingsdata</button></div>';
+  return h;
+}
+
+function render(){
+  var h;
+  if(!S.loggedIn) h = vLogin();
+  else if(S.view==='minside') h = vMinside();
+  else if(S.view==='veien') h = vVeien();
+  else h = vPlan();
+  if(!S.loggedIn) h = topbar() + h;
+  $('#app').innerHTML = h;
+  window.scrollTo(0,0);
+  var f = $('#l-id')||$('#l-code')||$('#l-pw'); if(f) f.focus();
+  updateMissions();
+}
+function renderKeep(){ var y = window.scrollY; var x = ($('.board')||{}).scrollLeft||0; var h; render(); window.scrollTo(0,y); if($('.board')) $('.board').scrollLeft = x; }
+
+/* ---------- Modal ---------- */
+var lastFocus = null;
+function modal(html, label){
+  lastFocus = document.activeElement;
+  $('#modal-root').innerHTML = '<div class="bd" data-action="bd"><div class="modal" role="dialog" aria-modal="true" aria-label="'+esc(label||'Dialog')+'">'+html+'</div></div>';
+  var m = $('.modal'); var f = m.querySelector('input:not([type=radio]),textarea,button.opt,button.btn,.x'); (f||m).focus && (f||m).focus();
+}
+function closeModal(){ $('#modal-root').innerHTML = ''; if(lastFocus && lastFocus.focus) try{ lastFocus.focus(); }catch(e){} }
+function mtop(back){
+  return '<div class="m-top">'+(back?'<button type="button" class="linkbtn" data-action="add">‹ Tilbake til kategorier</button>':'<span></span>')+'<button type="button" class="x" data-action="close" aria-label="Lukk">×</button></div>';
+}
+
+function info(k){
+  var t = {
+    dialog:['Dialog med veileder','Dette er en øvingsside. Her kan du ikke sende meldinger. På den ekte siden kan du skrive til veilederen din.'],
+    meldekort:['Meldekort','Dette er en øvingsside. Her kan du ikke sende meldekort. Husk å føre opp timene du har jobbet på det ekte meldekortet.'],
+    cv:['CV og jobbprofil','Dette er en øvingsside. Her kan du ikke lage CV. Du kan øve på å lage CV i timen.'],
+    om:['Om øvingssiden','Denne siden er laget for språkopplæring. Den ligner på Aktivitetsplanen, men den er ikke NAV og ikke BankID. Alt du skriver lagres bare i nettleseren din. Du kan nullstille alt nederst på siden.']
+  }[k];
+  modal(mtop(false)+'<div class="m-body"><h2>'+esc(t[0])+'</h2><p>'+esc(t[1])+'</p><button type="button" class="btn" data-action="close">Lukk</button></div>', t[0]);
+}
+
+function addChooser(){
+  modal(mtop(false)+'<div class="m-body"><div class="add-pic"><i>'+IC.mon+'</i></div><h2 style="text-align:center;font-size:2rem">Legg til</h2>'
+    + '<button type="button" class="opt" data-action="type" data-type="sok">En jobb jeg vil søke på <span style="width:.9rem">'+IC.chev+'</span></button>'
+    + '<button type="button" class="opt" data-action="type" data-type="egen">Jobbrettet egenaktivitet <span style="width:.9rem">'+IC.chev+'</span></button>'
+    + '<button type="button" class="opt" data-action="type" data-type="jobb">Jobb jeg har nå <span style="width:.9rem">'+IC.chev+'</span></button>'
+    + '</div>', 'Legg til aktivitet');
+}
+
+/* ---------- Skjema ---------- */
+function fld(o){
+  var id = 'f-'+o.name, req = o.req;
+  var label = o.label + (o.mode==='star' ? (req?' *':'') : ' <small>('+(req?'obligatorisk':'valgfri')+')</small>');
+  var inp;
+  var v = o.value == null ? '' : o.value;
+  if(o.area) inp = '<textarea id="'+id+'" name="'+o.name+'"'+(o.max?' maxlength="'+o.max+'"':'')+'>'+esc(v)+'</textarea>'+(o.max?'<div class="count" id="'+id+'-c">Antall tegn igjen '+(o.max-v.length)+'</div>':'');
+  else inp = '<input id="'+id+'" name="'+o.name+'" type="'+(o.date?'date':'text')+'" value="'+esc(v)+'"'+(o.ph?' placeholder="'+esc(o.ph)+'"':'')+' autocomplete="off">';
+  return '<div data-wrap="'+o.name+'"><label class="lbl" for="'+id+'">'+label+'</label>'+inp+'</div>';
+}
+function formModal(type, v, editId){
+  v = v || {};
+  var star = type!=='sok' ? 'star' : 'word';
+  var h = mtop(!editId) + '<div class="m-body"><form data-form="act" data-type="'+type+'" data-id="'+(editId||'')+'" novalidate>';
+  if(type==='jobb'){
+    h += '<h2>Jobb jeg har nå</h2><p>Her kan du notere ned en deltidsjobb eller midlertidig stilling du har nå. Da kan vi følge deg opp bedre. Husk å føre opp de timene du har jobbet på meldekortet.</p><div class="req-note">* må fylles ut</div>';
+    h += fld({name:'title',label:'Stillingstittel',req:1,mode:star,value:v.title});
+    h += '<div class="row2">'+fld({name:'fra',label:'Fra dato',req:1,mode:star,date:1,value:v.fra})+fld({name:'til',label:'Til dato',mode:star,date:1,value:v.til})+'</div>';
+    h += '<div data-wrap="andel"><div class="lbl">Stillingsandel *</div><label class="radio"><input type="radio" name="andel" value="Heltid"'+(v.andel==='Heltid'?' checked':'')+'>Heltid</label><label class="radio"><input type="radio" name="andel" value="Deltid"'+(v.andel==='Deltid'?' checked':'')+'>Deltid</label></div>';
+    h += fld({name:'arbeidsgiver',label:'Arbeidsgiver',mode:star,value:v.arbeidsgiver});
+    h += fld({name:'ansettelse',label:'Ansettelsesforhold (fast, midlertidig, vikariat)',mode:star,value:v.ansettelse});
+    h += fld({name:'beskrivelse',label:'Kort beskrivelse av arbeidstid (dag, kveld, helg, stillingsprosent) og arbeidsoppgaver',mode:star,area:1,value:v.beskrivelse});
+  } else if(type==='egen'){
+    h += '<h2>Jobbrettet egenaktivitet</h2><p>Her kan du eller veilederen din legge inn aktiviteter som hjelper deg når du skal komme i arbeid. Eksempler kan være å registrere deg hos bemannings- og rekrutteringsbyråer, jobbe godt med CV-en, eller lage oversikt over personer som kan være nyttig å kontakte når du er på jakt etter jobb.</p><div class="req-note">* må fylles ut</div>';
+    h += fld({name:'title',label:'Navn på aktiviteten',req:1,mode:star,value:v.title});
+    h += '<div class="row2">'+fld({name:'fra',label:'Fra dato',req:1,mode:star,date:1,value:v.fra})+fld({name:'til',label:'Til dato',req:1,mode:star,date:1,value:v.til})+'</div>';
+    h += fld({name:'mal',label:'Mål med aktiviteten',mode:star,value:v.mal});
+    h += fld({name:'beskrivelse',label:'Kort beskrivelse av aktiviteten',mode:star,area:1,value:v.beskrivelse});
+    h += fld({name:'huskeliste',label:'Min huskeliste for denne aktiviteten',mode:star,area:1,value:v.huskeliste});
+    h += fld({name:'lenke',label:'Lenke til aktiviteten',mode:star,value:v.lenke,ph:'https://'});
+  } else {
+    h += '<h2>En jobb jeg vil søke på</h2><p>Her kan du legge til informasjon om en stilling du har lyst å søke på. Du kan også legge til en stilling du allerede har søkt på.</p>';
+    h += fld({name:'title',label:'Stillingstittel',req:1,mode:star,value:v.title});
+    h += '<div class="row2">'+fld({name:'fra',label:'Fra dato',req:1,mode:star,date:1,value:v.fra})+fld({name:'frist',label:'Frist',mode:star,date:1,value:v.frist})+'</div>';
+    h += fld({name:'arbeidsgiver',label:'Arbeidsgiver',mode:star,value:v.arbeidsgiver});
+    h += fld({name:'kontakt',label:'Kontaktperson hos arbeidsgiver',mode:star,value:v.kontakt});
+    h += fld({name:'sted',label:'Arbeidssted',mode:star,value:v.sted});
+    h += fld({name:'beskrivelse',label:'Kort beskrivelse av stillingen',mode:star,area:1,max:5000,value:v.beskrivelse});
+    h += fld({name:'lenke',label:'Lenke til stillingsannonse',mode:star,value:v.lenke,ph:'https://'});
+  }
+  h += '<div style="margin-top:1.5rem;display:flex;gap:.8rem"><button class="btn up" type="submit">Lagre</button><button class="btn sec up" type="button" data-action="close">Avbryt</button></div></form></div>';
+  modal(h, TYPES[type].n);
+}
+
+function readForm(f){
+  var o = {}; var els = f.elements;
+  for(var i=0;i<els.length;i++){ var e = els[i]; if(!e.name) continue; if(e.type==='radio'){ if(e.checked) o[e.name]=e.value; } else o[e.name] = e.value.trim(); }
+  return o;
+}
+function validate(type, o){
+  var errs = {};
+  var need = {jobb:['title','fra','andel'], egen:['title','fra','til'], sok:['title','fra']}[type];
+  need.forEach(function(k){ if(!o[k]) errs[k] = k==='andel' ? 'Du må velge heltid eller deltid' : 'Du må fylle ut dette feltet'; });
+  var end = type==='sok' ? 'frist' : 'til';
+  if(!errs.fra && o[end] && o[end] < o.fra) errs[end] = (type==='sok' ? 'Fristen' : 'Til dato') + ' kan ikke være før fra dato';
+  if(o.lenke && !/^https?:\/\/.+\..+/i.test(o.lenke)) errs.lenke = 'Lenken må starte med https://';
+  return errs;
+}
+var LABELS = {title:'Tittel / navn', fra:'Fra dato', til:'Til dato', frist:'Frist', andel:'Stillingsandel', lenke:'Lenke'};
+function showErrors(form, errs){
+  Array.prototype.forEach.call(form.querySelectorAll('.err,.errsum'), function(e){ e.remove(); });
+  Array.prototype.forEach.call(form.querySelectorAll('[aria-invalid]'), function(e){ e.removeAttribute('aria-invalid'); });
+  var keys = Object.keys(errs);
+  if(!keys.length) return;
+  var sum = document.createElement('div'); sum.className = 'errsum'; sum.setAttribute('role','alert');
+  sum.textContent = 'Du må rette '+keys.length+' '+(keys.length===1?'feil':'feil')+' før du kan lagre.';
+  form.insertBefore(sum, form.firstChild.nextSibling ? form.children[1] : form.firstChild);
+  keys.forEach(function(k){
+    var w = form.querySelector('[data-wrap="'+k+'"]'); if(!w) return;
+    var d = document.createElement('div'); d.className = 'err'; d.textContent = errs[k]; w.appendChild(d);
+    var inp = w.querySelector('input,textarea'); if(inp){ inp.setAttribute('aria-invalid','true'); }
+  });
+  var first = form.querySelector('[aria-invalid="true"]') || sum; if(first.focus) first.focus();
+  var mb = $('.modal'); if(mb) mb.scrollIntoView({block:'start'});
+}
+function submitAct(form){
+  var type = form.getAttribute('data-type'), id = form.getAttribute('data-id');
+  var o = readForm(form);
+  var errs = validate(type, o);
+  if(Object.keys(errs).length){ showErrors(form, errs); return; }
+  if(id){
+    var a = S.acts.filter(function(x){ return x.id===id; })[0];
+    Object.assign(a, o); a.hist.push('Aktiviteten ble endret');
+    save(); closeModal(); renderKeep(); openAct(id); return;
+  }
+  var act = Object.assign({id:'a'+Date.now()+Math.floor(Math.random()*999), type:type, hist:['Aktiviteten ble opprettet']}, o);
+  act.status = type==='egen' ? 'forslag' : (type==='sok' ? 'planlegger' : 'gjennomforer');
+  if(type==='sok') act.soknad = 'ikke';
+  S.acts.push(act); save(); mark(type);
+  closeModal(); renderKeep();
+  var cardEl = document.querySelector('[data-id="'+act.id+'"]'); if(cardEl) cardEl.focus();
+}
+
+/* ---------- Aktivitetsdetaljer ---------- */
+function openAct(id, openSec, savedMsg){
+  var a = S.acts.filter(function(x){ return x.id===id; })[0]; if(!a) return;
+  var col = COLS.filter(function(c){ return c.k===a.status; })[0];
+  var h = '<div class="m-top"><span>'+esc(col.n)+' / '+esc(TYPES[a.type].n)+'</span><button type="button" class="x" data-action="close" aria-label="Lukk">×</button></div><div class="m-body">';
+  h += '<div style="display:flex;justify-content:space-between;gap:1rem;align-items:flex-start"><h2 style="margin-bottom:0">'+esc(a.title)+'</h2><button type="button" class="linkbtn" data-action="edit-act" data-id="'+a.id+'">Endre</button></div>';
+  h += '<dl class="dl">';
+  function dd(t, v, raw){ if(v) h += '<dt>'+t+'</dt><dd>'+(raw?v:esc(v))+'</dd>'; }
+  dd(a.type==='jobb'?'Fra dato':'Fra dato', fmt(a.fra));
+  dd(a.type==='sok'?'Frist':'Til dato', fmt(a.type==='sok'?a.frist:a.til));
+  dd('Stillingsandel', a.andel);
+  dd('Arbeidsgiver', a.arbeidsgiver);
+  dd('Ansettelsesforhold', a.ansettelse);
+  dd('Kontaktperson', a.kontakt);
+  dd('Arbeidssted', a.sted);
+  dd('Mål med aktiviteten', a.mal);
+  dd('Beskrivelse', a.beskrivelse);
+  dd('Huskeliste', a.huskeliste);
+  if(a.lenke) dd('Lenke', '<a href="'+esc(a.lenke)+'" target="_blank" rel="noopener noreferrer">'+esc(a.lenke)+'</a>', true);
+  h += '</dl>';
+  if(a.type==='sok'){
+    h += '<div class="acc"><div class="acc-h">Hvor langt har du kommet i søknadsprosessen?</div><div class="acc-b"><form data-form="soknad" data-id="'+a.id+'">';
+    SOKNAD.forEach(function(s){ h += '<label class="radio"><input type="radio" name="soknad" value="'+s.k+'"'+(a.soknad===s.k?' checked':'')+'>'+esc(s.n)+'</label>'; });
+    h += '<div style="margin-top:.8rem"><button class="btn" type="submit">Lagre</button>'+(savedMsg==='soknad'?'<span class="saved" role="status">✓ Lagret</span>':'')+'</div></form></div></div>';
+  }
+  h += '<div class="acc"><div class="acc-h">Hva er status på aktiviteten? <small style="font-weight:400;margin-left:auto">'+esc(col.n)+'</small></div><div class="acc-b"><form data-form="status" data-id="'+a.id+'">';
+  COLS.forEach(function(c){ h += '<label class="radio"><input type="radio" name="status" value="'+c.k+'"'+(a.status===c.k?' checked':'')+'>'+esc(c.n)+'</label>'; });
+  h += '<div style="margin-top:.8rem"><button class="btn" type="submit">Lagre</button>'+(savedMsg==='status'?'<span class="saved" role="status">✓ Lagret</span>':'')+'</div></form></div></div>';
+  h += '<div class="acc"><div class="acc-h">Historikk</div><div class="acc-b"><ul class="hist">'+a.hist.slice().reverse().map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul></div></div>';
+  h += '<p style="margin-top:1.2rem"><button type="button" class="linkbtn" data-action="del-act" data-id="'+a.id+'">Slett denne aktiviteten</button></p>';
+  h += '</div>';
+  modal(h, a.title);
+}
+
+/* ---------- Mål ---------- */
+function goalModal(){
+  var old = S.oldGoals.length ? '<details style="margin-top:1.2rem"><summary>Vis tidligere lagrede mål</summary><ul>'+S.oldGoals.map(function(g){ return '<li>'+esc(g)+'</li>'; }).join('')+'</ul></details>' : '<p style="color:#555;margin-top:1.2rem">Du har ingen tidligere lagrede mål.</p>';
+  modal(mtop(false)+'<div class="m-body"><h2>Mitt mål</h2><p>Skriv et realistisk mål. Målet må være mulig å nå på kort tid.</p><form data-form="goal" novalidate><label class="lbl" for="g-t">Hva er målet ditt?</label><textarea id="g-t" maxlength="500">'+esc(S.goal)+'</textarea><div class="count" id="g-c"></div><div style="margin-top:1.2rem;display:flex;gap:.8rem"><button class="btn up" type="submit">Lagre</button><button type="button" class="btn sec up" data-action="close">Avbryt</button></div></form>'+old+'</div>', 'Mitt mål');
+  var t = $('#g-t'); function c(){ $('#g-c').textContent = 'Antall tegn igjen '+(500-t.value.length); } c(); t.addEventListener('input', c);
+}
+
+/* ---------- Oppdrag ---------- */
+function updateMissions(){
+  var n = MISSIONS.filter(function(m){ return S.done[m.k]; }).length;
+  var cnt = $('#mcount'); if(cnt) cnt.textContent = '(' + n + '/' + MISSIONS.length + ')';
+  var d = $('#drawer'); if(!d) return;
+  var h = '<div style="display:flex;justify-content:space-between;align-items:center"><h2>Øvingsoppdrag</h2><button type="button" class="linkbtn" data-action="missions">Lukk</button></div>';
+  h += '<p style="margin:.2rem 0 .6rem">Gjør oppdragene ett for ett. Et grønt merke betyr at oppdraget er ferdig.</p>';
+  h += '<div class="bar" aria-hidden="true"><i style="width:'+(n/MISSIONS.length*100)+'%"></i></div><p style="margin:.3rem 0"><b>'+n+' av '+MISSIONS.length+' ferdig</b></p>';
+  if(n===MISSIONS.length) h += '<div class="win" role="status">🎉 Bra jobbet! Du har øvd på hele Aktivitetsplanen.</div>';
+  h += '<ul class="m-list">' + MISSIONS.map(function(m, i){ var dn = S.done[m.k]; return '<li class="'+(dn?'done':'')+'"><span class="ck">'+(dn?'✓':'')+'</span><span><b>'+(i+1)+'. '+esc(m.t)+'</b><small>'+esc(m.h)+'</small></span></li>'; }).join('') + '</ul>';
+  d.innerHTML = h;
+  d.classList.toggle('open', ui.drawer);
+}
+
+/* ---------- Hendelser ---------- */
+var LOGIN = ['12345678901','123456','ovingpass'];
+var LOGINERR = ['Dette er ikke øvingsnummeret. Skriv 12345678901.','Feil kode. Skriv 123456.','Feil passord. Skriv ovingpass.'];
+
+document.addEventListener('click', function(ev){
+  var t = ev.target.closest('[data-action]');
+  if(ui.filterOpen && !ev.target.closest('.filter-panel') && !(t && t.getAttribute('data-action')==='filter')){ ui.filterOpen = false; renderKeep(); t = ev.target.closest('[data-action]'); }
+  if(!t) return;
+  var a = t.getAttribute('data-action');
+  if(a==='bd'){ if(ev.target===t) closeModal(); return; }
+  if(ev.target.closest('.modal') && a==='bd') return;
+  ev.preventDefault && t.tagName==='A' && ev.preventDefault();
+  switch(a){
+    case 'nav': closeModal(); S.view = t.getAttribute('data-to'); if(S.view==='plan') mark('plan'); ui.filterOpen=false; ui.help=null; save(); render(); break;
+    case 'logout': S.loggedIn = false; S.view = 'login'; S.step = 0; ui.error=''; save(); render(); break;
+    case 'login-back': S.step = Math.max(0,S.step-1); ui.error=''; render(); break;
+    case 'info': info(t.getAttribute('data-info')); break;
+    case 'close': closeModal(); break;
+    case 'add': addChooser(); break;
+    case 'type': formModal(t.getAttribute('data-type')); break;
+    case 'open-act': openAct(t.getAttribute('data-id')); break;
+    case 'edit-act': (function(){ var id=t.getAttribute('data-id'); var x=S.acts.filter(function(y){return y.id===id;})[0]; formModal(x.type, x, id); })(); break;
+    case 'del-act': if(window.confirm('Vil du slette denne aktiviteten?')){ var id=t.getAttribute('data-id'); S.acts = S.acts.filter(function(y){return y.id!==id;}); save(); closeModal(); renderKeep(); } break;
+    case 'edit-goal': goalModal(); break;
+    case 'filter': ui.filterOpen = !ui.filterOpen; renderKeep(); break;
+    case 'help': var c = t.getAttribute('data-col'); ui.help = ui.help===c ? null : c; renderKeep(); break;
+    case 'print': mark('print'); window.print(); break;
+    case 'missions': ui.drawer = !ui.drawer; updateMissions(); break;
+    case 'reset': if(window.confirm('Vil du slette alt du har skrevet i øvingen?')){ S = blank(); S.loggedIn = true; S.view='minside'; ui.filterOpen=false; ui.help=null; save(); render(); } break;
+  }
+});
+
+document.addEventListener('change', function(ev){
+  var t = ev.target;
+  if(t.getAttribute && t.getAttribute('data-filter')){
+    var g = t.getAttribute('data-filter'), arr = S.filter[g], i = arr.indexOf(t.value);
+    if(t.checked && i<0) arr.push(t.value); if(!t.checked && i>=0) arr.splice(i,1);
+    if(arr.length) mark('filter'); else if(S.filter.types.length||S.filter.statuses.length) mark('filter');
+    save(); renderKeep();
+    var again = document.querySelector('[data-filter="'+g+'"][value="'+t.value+'"]'); if(again) again.focus();
+  }
+});
+document.addEventListener('input', function(ev){
+  var t = ev.target;
+  if(t.id==='f-beskrivelse' && t.maxLength===5000){ var c = $('#f-beskrivelse-c'); if(c) c.textContent = 'Antall tegn igjen '+(5000-t.value.length); }
+});
+document.addEventListener('keydown', function(ev){
+  if(ev.key==='Escape'){ if($('.modal')) closeModal(); else if(ui.drawer){ ui.drawer=false; updateMissions(); } else if(ui.filterOpen){ ui.filterOpen=false; renderKeep(); } }
+});
+
+document.addEventListener('submit', function(ev){
+  var f = ev.target; var kind = f.getAttribute('data-form'); if(!kind) return;
+  ev.preventDefault();
+  if(kind==='login'){
+    var inp = f.querySelector('input'); var val = inp.value.trim();
+    if(val !== LOGIN[S.step]){ ui.error = LOGINERR[S.step]; render(); return; }
+    ui.error = '';
+    if(S.step < 2){ S.step++; render(); return; }
+    $('#app').innerHTML = topbar() + '<div class="login"><div class="box" style="text-align:center"><p role="status" style="font-weight:700">Logger inn …</p><div style="width:2.5rem;height:2.5rem;border:4px solid #cddce8;border-top-color:var(--blue);border-radius:50%;margin:1rem auto;animation:sp 1s linear infinite"></div></div></div>';
+    setTimeout(function(){ S.loggedIn = true; S.view = 'minside'; S.step = 0; save(); mark('login'); render(); }, 900);
+    return;
+  }
+  if(kind==='act'){ submitAct(f); return; }
+  if(kind==='goal'){
+    var txt = $('#g-t').value.trim();
+    if(!txt){ var e = document.createElement('div'); e.className='err'; e.setAttribute('role','alert'); e.textContent='Du må skrive et mål'; if(!f.querySelector('.err')) $('#g-t').after(e); $('#g-t').setAttribute('aria-invalid','true'); return; }
+    if(txt !== S.goal){ S.oldGoals.unshift(S.goal); S.goal = txt; if(txt !== DEFAULT_GOAL) mark('goal'); }
+    save(); closeModal(); renderKeep(); return;
+  }
+  if(kind==='soknad'){
+    var id = f.getAttribute('data-id'); var a = S.acts.filter(function(x){return x.id===id;})[0];
+    var v = (f.querySelector('input:checked')||{}).value; if(!v) return;
+    var nm = SOKNAD.filter(function(x){return x.k===v;})[0].n;
+    if(a.soknad!==v){ a.hist.push('Søknadsstatus: '+nm); }
+    a.soknad = v; if(v==='sendt') mark('sendt');
+    save(); renderKeep(); openAct(id, null, 'soknad'); return;
+  }
+  if(kind==='status'){
+    var id2 = f.getAttribute('data-id'); var b = S.acts.filter(function(x){return x.id===id2;})[0];
+    var v2 = (f.querySelector('input:checked')||{}).value; if(!v2) return;
+    var nm2 = COLS.filter(function(x){return x.k===v2;})[0].n;
+    if(b.status!==v2){ b.hist.push('Status: '+nm2); }
+    b.status = v2; if(v2==='gjennomforer') mark('gjen');
+    save(); renderKeep(); openAct(id2, null, 'status'); return;
+  }
+});
+
+var st = document.createElement('style'); st.textContent = '@keyframes sp{to{transform:rotate(360deg)}}'; document.head.appendChild(st);
+
+load(); render();
+})();
+</script>
+</body>
+</html>
