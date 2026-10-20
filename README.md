@@ -1,0 +1,1 @@
+En nettside som skal etterlikne Aktivitetsplanen på nettsiden til NAV, slik at lærere kan lære opp elevene å bruke aktivitetsplanen, uten å få elevene til å logge inn med sin bank id, og alle de utfordringene dette medfører.
